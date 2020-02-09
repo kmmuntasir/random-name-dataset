@@ -15,11 +15,14 @@
 		return $final_array;
 	}
 
+	function dbresult($q) {
+		return extractRows(query($q));
+	}
+
 	function get($table, $limit=null) {
 		$q = "SELECT * FROM `$table`";
 		if($limit) $q .= " limit $limit";
-		$result = query($q);
-		return extractRows($result);
+		return dbresult($q);
 	}
 
 	function insert($table, $arr) {
@@ -39,19 +42,36 @@
 		return query($q);
 	}
 
-	function insert_batch($table, $arr) {
+	function insert_batch($table, $arr, $buffer=1000) {
+		$total = count($arr);
+		$beg = 0;
+		$end = $buffer-1;
+		$done= 0;
+		while($end < $total) {
+			$done += insert_batch_fragment($table, $arr, $beg, $end);
+			$beg += $buffer;
+			$end += $buffer;
+		}
+		if($beg < $total) {
+			$end = $total-1;
+			$done += insert_batch_fragment($table, $arr, $beg, $end);
+		}
+		return $done;
+	}
+
+	function insert_batch_fragment($table, $arr, $beg, $end) {
 		$q = "INSERT INTO `$table` (";
 		$delimiter = '';
 		$keys = $values = "";
-		foreach ($arr[0] as $key => $v) {
+		foreach ($arr[$beg] as $key => $v) {
 			$keys .= $delimiter."`$key`";
 			$delimiter = ', ';
 		}
 		$delimiter = '';
-		foreach ($arr as $key => $single_row) {
+		for($i=$beg; $i<=$end; ++$i) {
 			$single_values_row = "";
 			$d = '';
-			foreach ($single_row as $k => $value) {
+			foreach ($arr[$i] as $k => $value) {
 				if(is_string($value)) $single_values_row .= $d."'$value'";
 				else $single_values_row .= $d.$value;
 
@@ -59,13 +79,14 @@
 			}
 			$values .= $delimiter."(".$single_values_row.")";
 			$delimiter = ', ';
-
 		}
 		$q .= "$keys) VALUES $values";
 
-		return query($q);
-
+		query($q);
+//		printer("Beg: $beg, End: $end");
 //		printer($q);
+
+		return $end - $beg + 1;
 	}
 
 	function update($arr, $table) {

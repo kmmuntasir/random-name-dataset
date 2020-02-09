@@ -62,9 +62,17 @@
 		printer($result);
 	}
 
+	function unique_name_filter() {
+		$isFemale = isset($_GET['isfemale']) ? $_GET['isfemale'] : 0;
+		$persons = get_unique_names($isFemale, 10000, 50000);
+//		tabular($persons);
+		printer("Total: ".count($persons));
+		$result = insert_batch_names($isFemale, $persons);
+		printer($result);
+	}
+
 	function main() {
-		$person = get_person_by_name('Aaban');
-		printer($person);
+		
 	}
 
 	main();

@@ -14,7 +14,7 @@
 		HAVING COUNT(`name`) > 1
 		LIMIT 100;";
 
-		return extractRows(query($q));
+		return dbresult($q);
 	}
 
 	function get_person_by_name($name) {
@@ -25,6 +25,41 @@
 			`name` = '$name'
 		";
 
-		return extractRows(query($q));
+		return dbresult($q);
 	}
+
+	function get_unique_names($isFemale=false, $limit=1000, $offset=0) {
+		$table = $isFemale ? "female_persons" : "male_persons";
+		$q = "
+		SELECT `name`
+		FROM $table
+		GROUP BY `name`
+		LIMIT $offset, $limit
+		";
+
+		return dbresult($q);
+	}
+
+	function insert_batch_names($isFemale=false, $names, $buffer=1000) {
+		$table = $isFemale ? "female_unique_names" : "male_unique_names";
+		return insert_batch($table, $names, $buffer);
+
+	}
+//
+//CREATE TABLE person_temp
+//LIKE person;
+//
+//-- step 2
+//INSERT INTO person_temp
+//SELECT *
+//FROM person
+//GROUP BY `name`;
+//
+//
+//-- step 3
+//DROP TABLE person;
+//
+//ALTER TABLE person_temp
+//RENAME TO person;
+
 ?>
