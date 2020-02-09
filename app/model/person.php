@@ -45,6 +45,11 @@
 		return insert_batch($table, $names, $buffer);
 
 	}
+
+	function get_gender_dataset($isFemale=false) {
+		$table = $isFemale ? "female_unique_names" : "male_unique_names";
+		return get($table);
+	}
 //
 //CREATE TABLE person_temp
 //LIKE person;

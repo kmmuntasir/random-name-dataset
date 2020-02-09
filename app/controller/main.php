@@ -71,8 +71,42 @@
 		printer($result);
 	}
 
+	function generate_unique_name($dataset) {
+		$total = count($dataset);
+
+		$flag = rand(0, 1);
+
+		$a = $c = 0;
+		$b = $d = $total-1;
+
+		$a = 0;
+		$b = $total/2;
+		$c = $b+1;
+		$d = $total-1;
+
+		if($flag) {
+			$c = $a;
+			$d = $b;
+			$a = $d+1;
+			$b = $total-1;
+		}
+		$x = rand($a, $b);
+		do {$y = rand($c, $d);} while($y==$x);
+		$firstname = $dataset[$x]['name'];
+		$lastname = $dataset[$y]['name'];
+
+		$fullname = $firstname.' '.$lastname;
+		return $fullname;
+	}
+
 	function main() {
-		
+		$isFemale = isset($_GET['isfemale']) ? $_GET['isfemale'] : 0;
+		$dataset = get_gender_dataset($isFemale);
+		$name = generate_unique_name($dataset);
+
+		printer($name);
+		printer("Dataset Size: ".count($dataset));
+//		tabular($dataset);
 	}
 
 	main();
