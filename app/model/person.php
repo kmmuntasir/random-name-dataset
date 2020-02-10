@@ -40,14 +40,18 @@
 		return dbresult($q);
 	}
 
-	function insert_batch_names($isFemale=false, $names, $buffer=1000) {
-		$table = $isFemale ? "female_unique_names" : "male_unique_names";
-		return insert_batch($table, $names, $buffer);
+//	function insert_batch_names($gender="male", $names, $buffer=1000) {
+//		$table = $gender == "male" ? "male_unique_names" : "female_unique_names";
+//		return insert_batch($table, $names, $buffer);
+//	}
 
+	function insert_batch_nameset($names, $gender="male", $buffer=1000) {
+		$table = $gender == "male" ? "male_fullnames" : "female_fullnames";
+		return insert_batch($table, $names, $buffer);
 	}
 
-	function get_gender_dataset($isFemale=false) {
-		$table = $isFemale ? "female_unique_names" : "male_unique_names";
+	function get_gender_dataset($gender="male") {
+		$table = $gender == "male" ? "male_unique_names" : "female_unique_names";
 		return get($table);
 	}
 //

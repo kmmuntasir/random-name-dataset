@@ -76,9 +76,11 @@
 
 		$flag = rand(0, 1);
 
+		/* *********************************************** */
 		$a = $c = 0;
 		$b = $d = $total-1;
 
+		/* *********************************************** *
 		$a = 0;
 		$b = $total/2;
 		$c = $b+1;
@@ -90,22 +92,39 @@
 			$a = $d+1;
 			$b = $total-1;
 		}
+		/* *********************************************** */
+
 		$x = rand($a, $b);
 		do {$y = rand($c, $d);} while($y==$x);
-		$firstname = $dataset[$x]['name'];
-		$lastname = $dataset[$y]['name'];
+		$name = array();
+		$name['firstname'] = $dataset[$x]['name'];
+		$name['lastname'] = $dataset[$y]['name'];
 
-		$fullname = $firstname.' '.$lastname;
-		return $fullname;
+		$fullname = $name['firstname'].' '.$name['lastname'];
+		return $name;
+	}
+
+	function generate_unique_nameset($dataset, $limit=10000) {
+		$names = array();
+		while($limit--) {
+			$newName = generate_unique_name($dataset);
+			if(in_array($newName, $names)) continue;
+			$names[] = $newName;
+		}
+		return $names;
 	}
 
 	function main() {
-		$isFemale = isset($_GET['isfemale']) ? $_GET['isfemale'] : 0;
-		$dataset = get_gender_dataset($isFemale);
-		$name = generate_unique_name($dataset);
+		set_time_limit(0);
+		$gender = isset($_GET['gender']) ? $_GET['gender'] : "male";
+		$dataset = get_gender_dataset($gender);
+		$names = generate_unique_nameset($dataset, 100);
 
-		printer($name);
 		printer("Dataset Size: ".count($dataset));
+		printer("Nameset Size: ".count($names));
+//		$result = insert_batch_nameset($names, $gender);
+//		printer($result);
+		tabular($names);
 //		tabular($dataset);
 	}
 
